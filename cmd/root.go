@@ -21,8 +21,8 @@ func init() {
 
 	// Database
 	RootCmd.PersistentFlags().String("database-host", "localhost", "Database host")
-	RootCmd.PersistentFlags().Int("database-port", 3306, "Database port")
-	RootCmd.PersistentFlags().String("database-user", "root", "Database user")
+	RootCmd.PersistentFlags().Int("database-port", 5432, "Database port")
+	RootCmd.PersistentFlags().String("database-user", "admiral", "Database user")
 	RootCmd.PersistentFlags().String("database-password", "admiral", "Database password")
 	RootCmd.PersistentFlags().String("database-name", "admiral", "Database name")
 

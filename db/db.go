@@ -6,8 +6,8 @@ import (
 
 	"github.com/Devatoria/admiral/models"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
 )
 
@@ -18,12 +18,12 @@ var once sync.Once
 // a new one if needed using singleton pattern
 func Instance() *gorm.DB {
 	once.Do(func() {
-		db, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
-			viper.GetString("database.user"),
-			viper.GetString("database.password"),
+		db, err := gorm.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
 			viper.GetString("database.host"),
 			viper.GetInt("database.port"),
+			viper.GetString("database.user"),
 			viper.GetString("database.name"),
+			viper.GetString("database.password"),
 		))
 
 		if err != nil {
@@ -32,9 +32,6 @@ func Instance() *gorm.DB {
 
 		db.AutoMigrate(
 			&models.Event{},
-			&models.EventRequest{},
-			&models.EventSource{},
-			&models.EventTarget{},
 		)
 
 		instance = db
