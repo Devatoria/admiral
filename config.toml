@@ -7,3 +7,7 @@ port = 5432
 user = "admiral"
 password = "admiral"
 name = "admiral"
+
+[registry]
+address = "http://localhost"
+port = 5000

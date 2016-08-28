@@ -31,6 +31,13 @@ func init() {
 	viper.BindPFlag("database.user", RootCmd.PersistentFlags().Lookup("database-user"))
 	viper.BindPFlag("database.password", RootCmd.PersistentFlags().Lookup("database-password"))
 	viper.BindPFlag("database.name", RootCmd.PersistentFlags().Lookup("database-name"))
+
+	// Registry
+	RootCmd.PersistentFlags().String("registry-address", "http://localhost", "Registry address")
+	RootCmd.PersistentFlags().Int("registry-port", 5000, "Registry port")
+
+	viper.BindPFlag("registry.address", RootCmd.PersistentFlags().Lookup("registry-address"))
+	viper.BindPFlag("registry.port", RootCmd.PersistentFlags().Lookup("registry-port"))
 }
 
 func initConfig() {
