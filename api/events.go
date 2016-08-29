@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/Devatoria/admiral/db"
 	"github.com/Devatoria/admiral/models"
@@ -55,6 +56,39 @@ func postEvents(c *gin.Context) {
 		}
 
 		db.Instance().Create(&model)
+
+		// If event is a push, check if namespace and image exists or create them
+		if event.Action == "push" && event.Target.Tag != "" {
+			repSplit := strings.SplitN(event.Target.Repository, "/", 2)
+
+			// Get namespace
+			if len(repSplit) < 2 {
+				// Search for an image without namespace
+				var image models.Image
+				db.Instance().Where("name = ?", repSplit[0]).Find(&image)
+				if image.ID == 0 {
+					image.Name = repSplit[0]
+					db.Instance().Create(&image)
+				}
+			} else {
+				// Search for a namespace
+				var namespace models.Namespace
+				db.Instance().Where("name = ?", repSplit[0]).Find(&namespace)
+				if namespace.ID == 0 {
+					namespace.Name = repSplit[0]
+					db.Instance().Create(&namespace)
+				}
+
+				// Search for an image
+				var image models.Image
+				db.Instance().Where("name = ?", event.Target.Repository).Find(&image)
+				if image.ID == 0 {
+					image.Name = event.Target.Repository
+					image.Namespace = namespace
+					db.Instance().Create(&image)
+				}
+			}
+		}
 	}
 
 	c.Status(http.StatusOK)
