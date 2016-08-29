@@ -6,5 +6,6 @@ import (
 
 type Namespace struct {
 	gorm.Model
-	Name string
+	Name   string
+	Images []Image
 }

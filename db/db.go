@@ -33,6 +33,7 @@ func Instance() *gorm.DB {
 		db.AutoMigrate(
 			&models.Event{},
 			&models.Namespace{},
+			&models.Image{},
 		)
 
 		instance = db
