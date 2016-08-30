@@ -72,8 +72,8 @@ func SynchronizeCatalog() error {
 		// If public image (no namespace), just create image with null namespace
 		// Else, ensure namespace exists (or create it), and then create image
 		if len(repSplit) == 1 {
-			if _, ok := existingImages[repSplit[0]]; !ok {
-				image := models.Image{Name: repSplit[0]}
+			if _, ok := existingImages[repository]; !ok {
+				image := models.Image{Name: repository}
 				log.Printf("Creating public image %s\n", image.Name)
 				db.Instance().Create(&image)
 				existingImages[image.Name] = image.ID

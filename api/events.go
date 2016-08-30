@@ -87,6 +87,15 @@ func postEvents(c *gin.Context) {
 					image.Namespace = namespace
 					db.Instance().Create(&image)
 				}
+
+				// Search for a tag
+				var tag models.Tag
+				db.Instance().Where("name = ? AND image_id = ?", event.Target.Tag, image.ID).Find(&tag)
+				if tag.ID == 0 {
+					tag.Name = event.Target.Tag
+					tag.Image = image
+					db.Instance().Create(&tag)
+				}
 			}
 		}
 	}
