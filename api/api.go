@@ -40,6 +40,10 @@ func Run(address string, port int) {
 		v1.GET("/images", getImages)
 		v1.GET("/image/:id", getImage)
 		v1.GET("/image/:id/tags", getImageTags)
+
+		// User endpoints
+		v1.GET("/users", getUsers)
+		v1.POST("/user", postUser)
 	}
 
 	err := r.Run(fmt.Sprintf("%s:%d", address, port))
