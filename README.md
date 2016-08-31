@@ -5,6 +5,12 @@ This tool is listening to Docker Registry events using notifications in order to
 
 Admiral can synchronize itself with an existing registry by getting and parsing the catalog.
 
+## Roadmap
+
+* User and team models creation
+* Right management and authenticated calls
+* Registry auth endpoint
+
 ## Configuration
 ### Configure the daemon
 The configuration file of the Admiral daemon is really easy.
