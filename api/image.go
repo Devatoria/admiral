@@ -36,3 +36,23 @@ func getImage(c *gin.Context) {
 
 	c.JSON(http.StatusOK, image)
 }
+
+// getImageTags returns the tags associated to the given image
+func getImageTags(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong ID format"})
+		return
+	}
+
+	var tags []models.Tag
+	db.Instance().Order("name").Where("image_id = ?", id).Find(&tags)
+
+	if len(tags) == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	c.JSON(http.StatusOK, tags)
+}

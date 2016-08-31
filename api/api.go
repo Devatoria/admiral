@@ -38,6 +38,7 @@ func Run(address string, port int) {
 		// Image endpoints
 		v1.GET("/images", getImages)
 		v1.GET("/image/:id", getImage)
+		v1.GET("/image/:id/tags", getImageTags)
 	}
 
 	r.Run(fmt.Sprintf("%s:%d", address, port))
