@@ -11,6 +11,10 @@ import (
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	// Debug
+	RootCmd.PersistentFlags().BoolP("debug", "d", true, "Debug mode")
+	viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
+
 	// Address
 	RootCmd.PersistentFlags().StringP("address", "a", "127.0.0.1", "API listening address")
 	viper.BindPFlag("address", RootCmd.PersistentFlags().Lookup("address"))

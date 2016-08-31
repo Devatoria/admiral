@@ -5,9 +5,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func Run(address string, port int) {
+	if !viper.GetBool("debug") {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {
