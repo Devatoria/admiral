@@ -16,9 +16,19 @@ func Run(address string, port int) {
 
 	r.GET("/version", getVersion)
 
-	// Registry events notification endpoint
-	r.GET("/events", getEvents)
-	r.POST("/events", postEvents)
+	v1 := r.Group("/v1")
+	{
+		// Registry events notification endpoint
+		v1.GET("/events", getEvents)
+		v1.POST("/events", postEvents)
+
+		// Namespace endpoints
+		v1.GET("/namespaces", getNamespaces)
+		v1.GET("/namespace/:id", getNamespace)
+		v1.POST("/namespace", postNamespace)
+		v1.DELETE("/namespace/:id", deleteNamespace)
+		v1.PATCH("/namespace/:id", patchNamespace)
+	}
 
 	r.Run(fmt.Sprintf("%s:%d", address, port))
 }

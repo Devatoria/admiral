@@ -6,6 +6,5 @@ import (
 
 type Namespace struct {
 	gorm.Model
-	Name   string
-	Images []Image
+	Name string `gorm:not null;unique"`
 }
