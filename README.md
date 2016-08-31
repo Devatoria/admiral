@@ -1,4 +1,4 @@
-# admiral
+# Admiral
 Admiral is a Docker Registry administration and authentication system. It is under development and is aiming to be a real production tool.
 
 This tool is listening to Docker Registry events using notifications in order to catch `pull` and `push` events (to make some audit, for example), but also to maintain a list of available images. Next, you will be able to create teams and users, and allow only certain user to pull or push certain images.
@@ -10,6 +10,7 @@ Admiral can synchronize itself with an existing registry by getting and parsing 
 The configuration file of the Admiral daemon is really easy.
 
 ```
+debug = true # Enable debug mode
 address = "127.0.0.1" # Admiral API listening address
 port = 3000 # Admiral API listening port
 
