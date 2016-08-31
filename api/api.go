@@ -33,6 +33,11 @@ func Run(address string, port int) {
 		v1.POST("/namespace", postNamespace)
 		v1.DELETE("/namespace/:id", deleteNamespace)
 		v1.PATCH("/namespace/:id", patchNamespace)
+		v1.GET("/namespace/:id/images", getNamespaceImages)
+
+		// Image endpoints
+		v1.GET("/images", getImages)
+		v1.GET("/image/:id", getImage)
 	}
 
 	r.Run(fmt.Sprintf("%s:%d", address, port))

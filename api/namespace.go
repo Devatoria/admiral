@@ -113,3 +113,22 @@ func patchNamespace(c *gin.Context) {
 
 	c.JSON(http.StatusOK, namespace)
 }
+
+// getNamespaceImages returns a list of images associated to the given namespace
+func getNamespaceImages(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong ID format"})
+		return
+	}
+
+	var images []models.Image
+	db.Instance().Where("namespace_id = ?", id).Find(&images)
+	if len(images) == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	c.JSON(http.StatusOK, images)
+}
