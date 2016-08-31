@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Run func registers endpoints and runs the API
 func Run(address string, port int) {
 	if !viper.GetBool("debug") {
 		gin.SetMode(gin.ReleaseMode)
@@ -41,5 +42,8 @@ func Run(address string, port int) {
 		v1.GET("/image/:id/tags", getImageTags)
 	}
 
-	r.Run(fmt.Sprintf("%s:%d", address, port))
+	err := r.Run(fmt.Sprintf("%s:%d", address, port))
+	if err != nil {
+		panic(err)
+	}
 }

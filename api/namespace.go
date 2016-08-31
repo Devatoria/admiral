@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Namespace represents a namespace form model
 type Namespace struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
