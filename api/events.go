@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/Devatoria/admiral/db"
@@ -14,8 +15,14 @@ import (
 )
 
 func getEvents(c *gin.Context) {
+	queryN := c.DefaultQuery("n", "25")
+	n, err := strconv.Atoi(queryN)
+	if err != nil {
+		n = 25
+	}
+
 	var events []models.Event
-	db.Instance().Find(&events)
+	db.Instance().Order("created_at desc").Limit(n).Find(&events)
 
 	c.JSON(http.StatusOK, events)
 }
