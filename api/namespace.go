@@ -43,8 +43,8 @@ func getNamespace(c *gin.Context) {
 	c.JSON(http.StatusOK, namespace)
 }
 
-// postNamespace creates a namespace in database if it doesn't exist
-func postNamespace(c *gin.Context) {
+// putNamespace creates a namespace in database if it doesn't exist
+func putNamespace(c *gin.Context) {
 	var data Namespace
 	err := c.BindJSON(&data)
 	if err != nil {

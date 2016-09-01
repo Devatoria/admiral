@@ -56,8 +56,8 @@ func getUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// postUser creates a new user using the given data, and hashing the password using bcrypt
-func postUser(c *gin.Context) {
+// putUser creates a new user using the given data, and hashing the password using bcrypt
+func putUser(c *gin.Context) {
 	var data User
 	err := c.BindJSON(&data)
 	if err != nil {

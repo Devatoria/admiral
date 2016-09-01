@@ -31,7 +31,7 @@ func Run(address string, port int) {
 		// Namespace endpoints
 		v1.GET("/namespaces", getNamespaces)
 		v1.GET("/namespace/:id", getNamespace)
-		v1.POST("/namespace", postNamespace)
+		v1.PUT("/namespace", putNamespace)
 		v1.DELETE("/namespace/:id", deleteNamespace)
 		v1.PATCH("/namespace/:id", patchNamespace)
 		v1.GET("/namespace/:id/images", getNamespaceImages)
@@ -44,7 +44,7 @@ func Run(address string, port int) {
 		// User endpoints
 		v1.GET("/users", getUsers)
 		v1.GET("/user", getUser)
-		v1.POST("/user", postUser)
+		v1.PUT("/user", putUser)
 	}
 
 	err := r.Run(fmt.Sprintf("%s:%d", address, port))
