@@ -43,6 +43,7 @@ func Run(address string, port int) {
 
 		// User endpoints
 		v1.GET("/users", getUsers)
+		v1.GET("/user", getUser)
 		v1.POST("/user", postUser)
 	}
 
