@@ -14,8 +14,15 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Catalog represents the Docker Registry catalog JSON format
 type Catalog struct {
 	Repositories []string `json:"repositories"`
+}
+
+// Tags represents the Docker Registry tags list JSON format
+type Tags struct {
+	Name string   `json:"name"`
+	Tags []string `json:"tags"`
 }
 
 func SynchronizeCatalog() error {
@@ -39,6 +46,7 @@ func SynchronizeCatalog() error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	// Parse catalog
 	var catalog Catalog
@@ -92,6 +100,51 @@ func SynchronizeCatalog() error {
 				db.Instance().Create(&image)
 				existingImages[image.Name] = image.ID
 			}
+		}
+
+		// Retrieve tags for current image
+		reqTags, err := http.NewRequest("GET", fmt.Sprintf("%s:%d/v2/%s/tags/list", registryAddress, registryPort, repository), nil)
+		if err != nil {
+			log.Printf("Unable to create HTTP request: %v", err)
+			continue
+		}
+
+		respTags, err := client.Do(reqTags)
+		if err != nil {
+			log.Printf("Unable to do HTTP request: %v", err)
+			continue
+		}
+		defer respTags.Body.Close()
+
+		dataTags, err := ioutil.ReadAll(respTags.Body)
+		if err != nil {
+			log.Printf("Unable to read response body: %v", err)
+			continue
+		}
+
+		// Parse tags
+		var tags Tags
+		err = json.Unmarshal(dataTags, &tags)
+		if err != nil {
+			log.Printf("Unable to parse response: %v", err)
+			continue
+		}
+
+		// Create entities
+		for _, tag := range tags.Tags {
+			tagEntity := models.Tag{
+				Name:    tag,
+				ImageID: existingImages[repository],
+			}
+
+			// Check if tag exists
+			db.Instance().Where(&tagEntity).Find(&tagEntity)
+			if tagEntity.ID != 0 {
+				continue
+			}
+
+			fmt.Printf("Creating tag %s for image %s\n", tag, repository)
+			db.Instance().Create(&tagEntity)
 		}
 	}
 
