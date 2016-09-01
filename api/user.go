@@ -17,7 +17,7 @@ type User struct {
 	Password string `form:"password" json:"password" binding:"required"`
 }
 
-// getUsers returns users ordered by username
+// getUsers returns users ordered by username and hide passwords
 func getUsers(c *gin.Context) {
 	nParam := c.DefaultQuery("n", "25")
 	n, err := strconv.Atoi(nParam)
@@ -28,8 +28,32 @@ func getUsers(c *gin.Context) {
 
 	var users []models.User
 	db.Instance().Order("username").Limit(n).Find(&users)
+	for i, _ := range users {
+		users[i].Password = "[REDACTED]"
+	}
 
 	c.JSON(http.StatusOK, users)
+}
+
+// getUser returns the given user but hide its password
+func getUser(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	var user models.User
+	db.Instance().Where("id = ?", id).Find(&user)
+	if user.ID == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	user.Password = "[REDACTED]"
+
+	c.JSON(http.StatusOK, user)
 }
 
 // postUser creates a new user using the given data, and hashing the password using bcrypt
