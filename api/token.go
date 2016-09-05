@@ -1,0 +1,141 @@
+package api
+
+import (
+	"bytes"
+	"crypto"
+	"crypto/x509"
+	"encoding/base32"
+	"encoding/pem"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/Devatoria/admiral/auth"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
+	"github.com/spf13/viper"
+)
+
+type access struct {
+	Type    string   `json:"type"`
+	Name    string   `json:"name"`
+	Actions []string `json:"actions"`
+}
+
+type ClaimsAccess struct {
+	Type    string   `json:"type"`
+	Name    string   `json:"name"`
+	Actions []string `json:"actions"`
+}
+
+type Claims struct {
+	Access []ClaimsAccess `json:"access"`
+	jwt.StandardClaims
+}
+
+func getToken(c *gin.Context) {
+	if auth.Authenticate(c.Request) != nil {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+
+	service := c.Query("service")
+	scope := c.Query("scope")
+
+	// Parse scope
+	scopeSplit := strings.SplitN(scope, ":", 3)
+	if len(scopeSplit) < 3 {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+
+	repository := scopeSplit[1]
+
+	// Create bearer token
+	claims := Claims{
+		[]ClaimsAccess{
+			ClaimsAccess{
+				Type:    "repository",
+				Name:    repository,
+				Actions: []string{"pull", "push"},
+			},
+		},
+		jwt.StandardClaims{
+			Issuer:    viper.GetString("auth.issuer"),
+			Subject:   "username",
+			Audience:  service,
+			ExpiresAt: time.Now().Add(time.Duration(viper.GetInt("auth.token-expiration")) * time.Minute).Unix(),
+			NotBefore: time.Now().Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Id:        uuid.NewV4().String(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+
+	// Read certificate
+	certBytes, err := ioutil.ReadFile(viper.GetString("auth.certificate"))
+	if err != nil {
+		panic(err)
+	}
+
+	certPem, _ := pem.Decode(certBytes)
+	if certPem == nil {
+		panic("Failed to parse certificate")
+	}
+
+	cert, err := x509.ParseCertificate(certPem.Bytes)
+	if err != nil {
+		panic(err)
+	}
+
+	// Compute libtrust fingerprint
+	derBytes, err := x509.MarshalPKIXPublicKey(cert.PublicKey)
+	if err != nil {
+		panic(err)
+	}
+
+	hasher := crypto.SHA256.New()
+	hasher.Write(derBytes)
+	token.Header["kid"] = keyIDEncode(hasher.Sum(nil)[:30])
+
+	// Read certificate private key
+	keyBytes, err := ioutil.ReadFile(viper.GetString("auth.private-key"))
+	if err != nil {
+		panic(err)
+	}
+
+	keyBlock, _ := pem.Decode(keyBytes)
+	if keyBlock == nil {
+		panic("Failed to parse private key")
+	}
+
+	key, err := x509.ParsePKCS1PrivateKey(keyBlock.Bytes)
+	if err != nil {
+		panic(err)
+	}
+
+	tokenString, err := token.SignedString(key)
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+}
+
+func keyIDEncode(b []byte) string {
+	s := strings.TrimRight(base32.StdEncoding.EncodeToString(b), "=")
+	var buf bytes.Buffer
+	var i int
+	for i = 0; i < len(s)/4-1; i++ {
+		start := i * 4
+		end := start + 4
+		buf.WriteString(s[start:end] + ":")
+	}
+
+	buf.WriteString(s[i*4:])
+
+	return buf.String()
+}

@@ -24,6 +24,9 @@ func Run(address string, port int) {
 
 	v1 := r.Group("/v1")
 	{
+		// Registry token endpoint
+		v1.GET("/token", getToken)
+
 		// Registry events notification endpoint
 		v1.GET("/events", getEvents)
 		v1.POST("/events", postEvents)

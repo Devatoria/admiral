@@ -65,13 +65,6 @@ func putUser(c *gin.Context) {
 		return
 	}
 
-	// Hash password before storing it in database
-	hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), 10)
-	if err != nil {
-		panic(err)
-		return
-	}
-
 	// Check that username does not already exist
 	var user models.User
 	db.Instance().Where("username = ?", data.Username).Find(&user)
@@ -89,6 +82,13 @@ func putUser(c *gin.Context) {
 	// Check password validity
 	if err = filters.ValidatePassword(data.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Hash password before storing it in database
+	hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), 10)
+	if err != nil {
+		panic(err)
 		return
 	}
 

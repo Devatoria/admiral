@@ -3,6 +3,12 @@ debug = true
 address = "127.0.0.1"
 port = 3000
 
+[auth]
+issuer = "pepito"
+token-expiration = 5
+certificate = "/certs/server.crt"
+private-key = "/certs/server.key"
+
 [database]
 host = "localhost"
 port = 5432
