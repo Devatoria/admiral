@@ -1,15 +1,28 @@
 # Admiral
 Admiral is a Docker Registry administration and authentication system. It is under development and is aiming to be a real production tool.
 
-This tool is listening to Docker Registry events using notifications in order to catch `pull` and `push` events (to make some audit, for example), but also to maintain a list of available images. Next, you will be able to create teams and users, and allow only certain user to pull or push certain images.
+It works on 2 ways:
 
-Admiral can synchronize itself with an existing registry by getting and parsing the catalog.
+* The first is that Docker Registry is sending events to Admiral, so it can store them in database in order to make an audit of the registry.
+* The second is that Docker Registry calls Admiral to authenticate actions in order to restrict pulls and pushes to autorized user only.
+
+Admiral can synchronize itself with an existing registry using `synchronize` job described below.
 
 ## Roadmap
 
-* User and team models creation
-* Right management and authenticated calls
-* Registry auth endpoint
+Features:
+
+* Rights management
+* Authenticated calls
+* Delete images
+* Support other database engines
+* Support HTTPS
+
+Side projects:
+
+* API documentation
+* CLI
+* Web UI
 
 ## Configuration
 ### Configure the daemon
@@ -17,8 +30,15 @@ The configuration file of the Admiral daemon is really easy.
 
 ```
 debug = true # Enable debug mode
+
 address = "127.0.0.1" # Admiral API listening address
 port = 3000 # Admiral API listening port
+
+[auth]
+issuer = "pepito" # Registry auth issuer, must be the same as the registry configuration
+token-expiration = 5 # Token expiration time in minutes
+certificate = "/certs/server.crt" # Certiciate path
+private-key = "/certs/server.key" # Certificate private key path
 
 [database]
 host = "localhost" # Database host
@@ -32,7 +52,19 @@ address = "http://localhost" # Docker Registry address
 port = 5000 # Docker Registry port
 ```
 
-### Configure the Docker Registry
+### Configure the Docker Registry authentication
+In your `/etc/docker/registry/config.yml`, please add the following notification endpoint:
+
+```
+auth:
+  token:
+    realm: http://localhost:3000/v1/token
+    service: registry
+    issuer: pepito
+    rootcertbundle: /certs/server.crt
+```
+
+### Configure the Docker Registry events
 In your `/etc/docker/registry/config.yml`, please add the following notification endpoint:
 
 ```
