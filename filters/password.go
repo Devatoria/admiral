@@ -15,6 +15,7 @@ func init() {
 	}
 }
 
+// ValidatePassword returns an error if the given password doesn't match the regex, nil otherwise
 func ValidatePassword(password string) error {
 	if !passwordRegex.MatchString(password) {
 		return errors.New("Password does not match conditions")

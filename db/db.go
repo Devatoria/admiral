@@ -7,7 +7,7 @@ import (
 	"github.com/Devatoria/admiral/models"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres adapter
 	"github.com/spf13/viper"
 )
 

@@ -1,5 +1,6 @@
 package jobs
 
+// Jobs map containing all runnable jobs
 var Jobs map[string]func() error
 
 func init() {

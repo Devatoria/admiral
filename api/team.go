@@ -11,10 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Team represents a team form
 type Team struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
+// TeamUsers represents a list of users of a team
 type TeamUsers struct {
 	Users []int `form:"users" json:"users" binding:"required"`
 }

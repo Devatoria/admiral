@@ -25,6 +25,7 @@ type Tags struct {
 	Tags []string `json:"tags"`
 }
 
+// SynchronizeCatalog parses the registry catalog to get namespaces, images and associated tags and inserts it database if needed
 func SynchronizeCatalog() error {
 	// Request catalog from registry
 	registryAddress := viper.GetString("registry.address")

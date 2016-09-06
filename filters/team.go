@@ -15,6 +15,7 @@ func init() {
 	}
 }
 
+// ValidateTeam returns an error if the given team name doesn't match the regex, nil otherwise
 func ValidateTeam(team string) error {
 	if !teamRegex.MatchString(team) {
 		return errors.New("Team does not match conditions")

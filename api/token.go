@@ -19,23 +19,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-type access struct {
-	Type    string   `json:"type"`
-	Name    string   `json:"name"`
-	Actions []string `json:"actions"`
-}
-
+// ClaimsAccess represents an access to a repository
 type ClaimsAccess struct {
 	Type    string   `json:"type"`
 	Name    string   `json:"name"`
 	Actions []string `json:"actions"`
 }
 
+// Claims represents a custom JWT claims with a list of accesses
 type Claims struct {
 	Access []ClaimsAccess `json:"access"`
 	jwt.StandardClaims
 }
 
+// getToken returns a JWT bearer token to the registry containing the user accesses
 func getToken(c *gin.Context) {
 	if auth.Authenticate(c.Request) != nil {
 		c.Status(http.StatusUnauthorized)
@@ -98,7 +95,11 @@ func getToken(c *gin.Context) {
 	}
 
 	hasher := crypto.SHA256.New()
-	hasher.Write(derBytes)
+	_, err = hasher.Write(derBytes)
+	if err != nil {
+		panic(err)
+	}
+
 	token.Header["kid"] = keyIDEncode(hasher.Sum(nil)[:30])
 
 	// Read certificate private key
@@ -129,13 +130,20 @@ func keyIDEncode(b []byte) string {
 	s := strings.TrimRight(base32.StdEncoding.EncodeToString(b), "=")
 	var buf bytes.Buffer
 	var i int
+	var err error
 	for i = 0; i < len(s)/4-1; i++ {
 		start := i * 4
 		end := start + 4
-		buf.WriteString(s[start:end] + ":")
+		_, err = buf.WriteString(s[start:end] + ":")
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	buf.WriteString(s[i*4:])
+	_, err = buf.WriteString(s[i*4:])
+	if err != nil {
+		panic(err)
+	}
 
 	return buf.String()
 }

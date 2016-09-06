@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Event represents a registry event (such as pull or push)
 type Event struct {
 	gorm.Model
 	EventID          string

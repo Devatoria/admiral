@@ -15,6 +15,7 @@ func init() {
 	}
 }
 
+// ValidateUsername returns an error if the given username doesn't match the regex, nil otherwise
 func ValidateUsername(username string) error {
 	if !usernameRegex.MatchString(username) {
 		return errors.New("Username does not match conditions")

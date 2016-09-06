@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Image represents an image stored in the registry
 type Image struct {
 	gorm.Model
 	Name        string

@@ -24,7 +24,7 @@ func getNamespaces(c *gin.Context) {
 	c.JSON(http.StatusOK, namespaces)
 }
 
-// getNamespce returns a namespace from the given ID
+// getNamespace returns a namespace from the given ID
 func getNamespace(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)

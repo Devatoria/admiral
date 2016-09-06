@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Authenticate returns an error if the given request basic auth is unable to authenticate the user, nil otherwise
 func Authenticate(req *http.Request) error {
 	username, password, ok := req.BasicAuth()
 	if !ok {

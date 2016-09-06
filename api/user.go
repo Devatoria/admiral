@@ -12,6 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// User represents an user form
 type User struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
@@ -28,7 +29,7 @@ func getUsers(c *gin.Context) {
 
 	var users []models.User
 	db.Instance().Order("username").Limit(n).Find(&users)
-	for i, _ := range users {
+	for i := range users {
 		users[i].Password = "[REDACTED]"
 	}
 
@@ -89,7 +90,6 @@ func putUser(c *gin.Context) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), 10)
 	if err != nil {
 		panic(err)
-		return
 	}
 
 	user.Username = data.Username
@@ -160,7 +160,6 @@ func patchUser(c *gin.Context) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), 10)
 	if err != nil {
 		panic(err)
-		return
 	}
 
 	// Update data

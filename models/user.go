@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// User represents a... User... I think.
 type User struct {
 	gorm.Model
 	Username string `gorm:"not null;unique"`
