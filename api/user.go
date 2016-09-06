@@ -98,3 +98,76 @@ func putUser(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+// deleteUser marks the given user as deleted (but keep entry in database)
+func deleteUser(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	db.Instance().Where("id = ?", id).Delete(&models.User{})
+	c.Status(http.StatusOK)
+}
+
+// patchUser modifies the username and password of the given user, checking if the new username doesn't exist
+func patchUser(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	var data User
+	err = c.BindJSON(&data)
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	// Retrieve user
+	var user models.User
+	db.Instance().Where("id = ?", id).Find(&user)
+	if user.ID == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	// Check if username exists (if different than old one)
+	if user.Username != data.Username {
+		if db.Exists(db.Instance(), "username", data.Username, &models.User{}) {
+			c.Status(http.StatusConflict)
+			return
+		}
+	}
+
+	// Check username validity
+	if err = filters.ValidateUsername(data.Username); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check password validity
+	if err = filters.ValidatePassword(data.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Hash password before storing it in database
+	hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), 10)
+	if err != nil {
+		panic(err)
+		return
+	}
+
+	// Update data
+	user.Username = data.Username
+	user.Password = string(hash)
+	db.Instance().Save(&user)
+	user.Password = "[REDACTED]"
+
+	c.JSON(http.StatusOK, user)
+}

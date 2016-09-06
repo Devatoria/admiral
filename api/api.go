@@ -48,6 +48,20 @@ func Run(address string, port int) {
 		v1.GET("/users", getUsers)
 		v1.GET("/user", getUser)
 		v1.PUT("/user", putUser)
+		v1.DELETE("/user/:id", deleteUser)
+		v1.PATCH("/user/:id", patchUser)
+
+		// Team endpoints
+		v1.GET("/teams", getTeams)
+		v1.GET("/team/:id", getTeam)
+		v1.PUT("/team", putTeam)
+		v1.DELETE("/team/:id", deleteTeam)
+		v1.PATCH("/team/:id", patchTeam)
+
+		// Team users management endpoints
+		v1.GET("/teamUsers/:id", getTeamUsers)
+		v1.POST("/teamUsers/:id", postTeamUsers)
+		v1.DELETE("/teamUsers/:teamID/:userID", deleteTeamUser)
 	}
 
 	err := r.Run(fmt.Sprintf("%s:%d", address, port))

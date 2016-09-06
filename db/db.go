@@ -36,10 +36,23 @@ func Instance() *gorm.DB {
 			&models.Image{},
 			&models.Tag{},
 			&models.User{},
+			&models.Team{},
 		)
 
 		instance = db
 	})
 
 	return instance
+}
+
+// Exists returns true if the given model exists with the given condition, false otherwise
+func Exists(g *gorm.DB, field string, value, model interface{}) bool {
+	var count int
+	g.Model(model).Where(fmt.Sprintf("%s = ?", field), value).Count(&count)
+
+	if count == 0 {
+		return false
+	}
+
+	return true
 }
