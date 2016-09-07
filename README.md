@@ -80,6 +80,10 @@ notifications:
 
 For more information about notifications, please check the official Docker documentation: https://docs.docker.com/registry/configuration/#/notifications
 
+# Admiral jobs
+
+Admiral can run several jobs (more than just launch the API). To list them, just run the `admiral job list`. Here are some details.
+
 ## Synchronize the Docker Registry with Admiral
 
 Admiral can run a set of jobs (in addition of the default daemon behavior). Admiral can synchronize itself with the Docker Registry by getting and parsing the catalog, inserting non-existing namespaces and images into the database. Just run the `synchronize` job:
@@ -88,8 +92,10 @@ Admiral can run a set of jobs (in addition of the default daemon behavior). Admi
 admiral job run synchronize
 ```
 
-You can have the list of available jobs by using the following command:
+## Create admin user
+
+In order to create an Admiral admin user, just run the following command: 
 
 ```
-admiral job list
+admiral job run create_admin <username> <password>
 ```
