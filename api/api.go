@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Devatoria/admiral/middleware"
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -23,6 +25,7 @@ func Run(address string, port int) {
 	r.GET("/version", getVersion)
 
 	v1 := r.Group("/v1")
+	v1.Use(middleware.AuthMiddleware())
 	{
 		// Registry token endpoint
 		v1.GET("/token", getToken)

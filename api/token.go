@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Devatoria/admiral/auth"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
@@ -34,11 +32,6 @@ type Claims struct {
 
 // getToken returns a JWT bearer token to the registry containing the user accesses
 func getToken(c *gin.Context) {
-	if auth.Authenticate(c.Request) != nil {
-		c.Status(http.StatusUnauthorized)
-		return
-	}
-
 	service := c.Query("service")
 	scope := c.Query("scope")
 
