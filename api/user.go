@@ -94,6 +94,7 @@ func putUser(c *gin.Context) {
 
 	user.Username = data.Username
 	user.Password = string(hash)
+	user.IsAdmin = false
 	db.Instance().Create(&user)
 
 	c.Status(http.StatusOK)

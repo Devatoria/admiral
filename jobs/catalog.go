@@ -26,7 +26,7 @@ type Tags struct {
 }
 
 // SynchronizeCatalog parses the registry catalog to get namespaces, images and associated tags and inserts it database if needed
-func SynchronizeCatalog() error {
+func SynchronizeCatalog(args []string) error {
 	// Request catalog from registry
 	registryAddress := viper.GetString("registry.address")
 	registryPort := viper.GetInt("registry.port")

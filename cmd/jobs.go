@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Devatoria/admiral/jobs"
 
@@ -40,9 +41,10 @@ var jobRunCmd = &cobra.Command{
 
 		jobName := args[0]
 		if fn, ok := jobs.Jobs[jobName]; ok {
-			err := fn()
+			err := fn(args)
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
+				os.Exit(-1)
 			}
 		} else {
 			fmt.Println("Unknown job")
