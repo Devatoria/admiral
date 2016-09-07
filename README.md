@@ -8,12 +8,20 @@ It works on 2 ways:
 
 Admiral can synchronize itself with an existing registry using `synchronize` job described below.
 
+## Features
+
+* Existing registry synchronization
+* Auto-update images and tags lists by listening to registry events
+* Teams and users management
+* Namespaces and images management
+* Basic authenticated calls
+
 ## Roadmap
 
 Features:
 
 * Rights management
-* Authenticated calls
+* Advanced authenticated calls
 * Delete images
 * Support other database engines
 * Support HTTPS
