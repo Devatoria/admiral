@@ -23,6 +23,7 @@ func Run(address string, port int) {
 	})
 
 	r.GET("/version", getVersion)
+	r.POST("/events", postEvents)
 
 	v1 := r.Group("/v1")
 	v1.Use(middleware.AuthMiddleware())
@@ -32,7 +33,6 @@ func Run(address string, port int) {
 
 		// Registry events notification endpoint
 		v1.GET("/events", getEvents)
-		v1.POST("/events", postEvents)
 
 		// Namespace endpoints
 		v1.GET("/namespaces", getNamespaces)
