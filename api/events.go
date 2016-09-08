@@ -60,6 +60,7 @@ func postEvents(c *gin.Context) {
 			RequestUserAgent: event.Request.UserAgent,
 			SourceAddress:    event.Source.Addr,
 			SourceInstanceID: event.Source.InstanceID,
+			ActorName:        event.Actor.Name,
 		}
 
 		db.Instance().Create(&model)

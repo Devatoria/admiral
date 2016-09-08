@@ -97,7 +97,9 @@ func putUser(c *gin.Context) {
 	user.IsAdmin = false
 	db.Instance().Create(&user)
 
-	c.Status(http.StatusOK)
+	user.Password = "[REDACTED]"
+
+	c.JSON(http.StatusOK, user)
 }
 
 // deleteUser marks the given user as deleted (but keep entry in database)

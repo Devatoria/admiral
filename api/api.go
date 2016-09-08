@@ -26,45 +26,50 @@ func Run(address string, port int) {
 	r.POST("/events", postEvents)
 
 	v1 := r.Group("/v1")
-	v1.Use(middleware.AuthMiddleware())
 	{
-		// Registry token endpoint
-		v1.GET("/token", getToken)
-
-		// Registry events notification endpoint
-		v1.GET("/events", getEvents)
-
-		// Namespace endpoints
-		v1.GET("/namespaces", getNamespaces)
-		v1.GET("/namespace/:id", getNamespace)
-		v1.PUT("/namespace", putNamespace)
-		v1.DELETE("/namespace/:id", deleteNamespace)
-		v1.PATCH("/namespace/:id", patchNamespace)
-		v1.GET("/namespace/:id/images", getNamespaceImages)
-
-		// Image endpoints
-		v1.GET("/images", getImages)
-		v1.GET("/image/:id", getImage)
-		v1.GET("/image/:id/tags", getImageTags)
-
-		// User endpoints
-		v1.GET("/users", getUsers)
-		v1.GET("/user", getUser)
 		v1.PUT("/user", putUser)
-		v1.DELETE("/user/:id", deleteUser)
-		v1.PATCH("/user/:id", patchUser)
 
-		// Team endpoints
-		v1.GET("/teams", getTeams)
-		v1.GET("/team/:id", getTeam)
-		v1.PUT("/team", putTeam)
-		v1.DELETE("/team/:id", deleteTeam)
-		v1.PATCH("/team/:id", patchTeam)
+		// Authenticated endpoints
+		v1auth := r.Group("/v1")
+		v1auth.Use(middleware.AuthMiddleware())
+		{
+			// Registry token endpoint
+			v1auth.GET("/token", getToken)
 
-		// Team users management endpoints
-		v1.GET("/teamUsers/:id", getTeamUsers)
-		v1.POST("/teamUsers/:id", postTeamUsers)
-		v1.DELETE("/teamUsers/:teamID/:userID", deleteTeamUser)
+			// Registry events notifications endpoint
+			v1auth.GET("/events", getEvents)
+
+			// Namespace endpoints
+			v1auth.GET("/namespaces", getNamespaces)
+			v1auth.GET("/namespace/:id", getNamespace)
+			v1auth.PUT("/namespace", putNamespace)
+			v1auth.DELETE("/namespace/:id", deleteNamespace)
+			v1auth.PATCH("/namespace/:id", patchNamespace)
+			v1auth.GET("/namespace/:id/images", getNamespaceImages)
+
+			// Image endpoints
+			v1auth.GET("/images", getImages)
+			v1auth.GET("/image/:id", getImage)
+			v1auth.GET("/image/:id/tags", getImageTags)
+
+			// User endpoints
+			v1auth.GET("/users", getUsers)
+			v1auth.GET("/user", getUser)
+			v1auth.DELETE("/user/:id", deleteUser)
+			v1auth.PATCH("/user/:id", patchUser)
+
+			// Team endpoints
+			v1auth.GET("/teams", getTeams)
+			v1auth.GET("/team/:id", getTeam)
+			v1auth.PUT("/team", putTeam)
+			v1auth.DELETE("/team/:id", deleteTeam)
+			v1auth.PATCH("/team/:id", patchTeam)
+
+			// Team users management endpoints
+			v1auth.GET("/teamUsers/:id", getTeamUsers)
+			v1auth.POST("/teamUsers/:id", postTeamUsers)
+			v1auth.DELETE("/teamUsers/:teamID/:userID", deleteTeamUser)
+		}
 	}
 
 	err := r.Run(fmt.Sprintf("%s:%d", address, port))

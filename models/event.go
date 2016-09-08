@@ -26,4 +26,5 @@ type Event struct {
 	RequestUserAgent string
 	SourceAddress    string
 	SourceInstanceID string
+	ActorName        string
 }

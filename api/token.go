@@ -33,25 +33,16 @@ type Claims struct {
 // getToken returns a JWT bearer token to the registry containing the user accesses
 func getToken(c *gin.Context) {
 	service := c.Query("service")
-	scope := c.Query("scope")
-
-	// Parse scope
-	scopeSplit := strings.SplitN(scope, ":", 3)
-	if len(scopeSplit) < 3 {
-		c.Status(http.StatusUnauthorized)
-		return
-	}
-
-	repository := scopeSplit[1]
 
 	// Create bearer token
 	claims := Claims{
 		[]ClaimsAccess{
-			ClaimsAccess{
-				Type:    "repository",
-				Name:    repository,
-				Actions: []string{"pull", "push"},
-			},
+		// TODO: load accesses from database
+		//			ClaimsAccess{
+		//				Type:    "repository",
+		//				Name:    repository,
+		//				Actions: []string{"pull", "push"},
+		//			},
 		},
 		jwt.StandardClaims{
 			Issuer:    viper.GetString("auth.issuer"),
