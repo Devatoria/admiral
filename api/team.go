@@ -47,11 +47,13 @@ func getTeam(c *gin.Context) {
 	}
 
 	var team models.Team
-	db.Instance().Where("id = ?", id).Find(&team)
+	db.Instance().Preload("Owner").Where("id = ?", id).Find(&team)
 	if team.ID == 0 {
 		c.Status(http.StatusNotFound)
 		return
 	}
+
+	team.Owner.Password = "[REDACTED]"
 
 	c.JSON(http.StatusOK, team)
 }

@@ -97,6 +97,9 @@ func putUser(c *gin.Context) {
 	user.IsAdmin = false
 	db.Instance().Create(&user)
 
+	// Create user associated team
+	db.Instance().Create(&models.Team{Name: user.Username, Owner: user})
+
 	user.Password = "[REDACTED]"
 
 	c.JSON(http.StatusOK, user)
