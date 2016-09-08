@@ -11,11 +11,17 @@ import (
 // AuthMiddleware is a Gin middleware ensuring HTTP basic auth authentication
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var err error
-		if err = auth.Authenticate(c.Request); err != nil {
+		user, err := auth.Authenticate(c.Request)
+		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
 
+		if c.Keys == nil {
+			c.Keys = make(map[string]interface{})
+		}
+
+		c.Keys["user"] = user
 		c.Next()
 	}
 }

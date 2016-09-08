@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Devatoria/admiral/auth"
 	"github.com/Devatoria/admiral/db"
 	"github.com/Devatoria/admiral/filters"
 	"github.com/Devatoria/admiral/models"
@@ -74,7 +75,12 @@ func putTeam(c *gin.Context) {
 		return
 	}
 
-	team := models.Team{Name: data.Name}
+	owner, err := auth.GetCurrentUser(c)
+	if err != nil {
+		panic(err)
+	}
+
+	team := models.Team{Name: data.Name, Owner: owner}
 	db.Instance().Create(&team)
 
 	c.JSON(http.StatusOK, team)
