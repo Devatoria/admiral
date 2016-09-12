@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Devatoria/admiral/auth"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
@@ -33,20 +35,24 @@ type Claims struct {
 // getToken returns a JWT bearer token to the registry containing the user accesses
 func getToken(c *gin.Context) {
 	service := c.Query("service")
+	user, err := auth.GetCurrentUser(c)
+	if err != nil {
+		panic(err)
+	}
 
 	// Create bearer token
 	claims := Claims{
 		[]ClaimsAccess{
 		// TODO: load accesses from database
-		//			ClaimsAccess{
-		//				Type:    "repository",
-		//				Name:    repository,
-		//				Actions: []string{"pull", "push"},
-		//			},
+		//	ClaimsAccess{
+		//		Type:    "repository",
+		//		Name:    repository,
+		//		Actions: []string{"pull", "push"},
+		//	},
 		},
 		jwt.StandardClaims{
 			Issuer:    viper.GetString("auth.issuer"),
-			Subject:   "username",
+			Subject:   user.Username,
 			Audience:  service,
 			ExpiresAt: time.Now().Add(time.Duration(viper.GetInt("auth.token-expiration")) * time.Minute).Unix(),
 			NotBefore: time.Now().Unix(),
