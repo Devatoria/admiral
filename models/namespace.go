@@ -8,6 +8,6 @@ import (
 type Namespace struct {
 	gorm.Model
 	Name    string `gorm:not null;unique"`
-	Owner   Team
+	Owner   Team   `json:"-"`
 	OwnerID uint
 }

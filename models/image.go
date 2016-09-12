@@ -8,6 +8,6 @@ import (
 type Image struct {
 	gorm.Model
 	Name        string
-	Namespace   Namespace
+	Namespace   Namespace `json:"-"`
 	NamespaceID uint
 }

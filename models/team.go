@@ -8,7 +8,7 @@ import (
 type Team struct {
 	gorm.Model
 	Name    string `gorm:"not null;unique"`
-	Owner   User
+	Owner   User   `json:"-"`
 	OwnerID uint
-	Users   []User `gorm:"many2many:team_users;"`
+	Users   []User `gorm:"many2many:team_users;" json:"-"`
 }

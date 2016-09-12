@@ -10,5 +10,5 @@ type User struct {
 	Username string `gorm:"not null;unique"`
 	Password string `gorm:"not null"`
 	IsAdmin  bool   `gorm:not null"`
-	Teams    []Team `gorm:"many2many:team_users;"`
+	Teams    []Team `gorm:"many2many:team_users;" json:"-"`
 }

@@ -8,6 +8,6 @@ import (
 type Tag struct {
 	gorm.Model
 	Name    string
-	Image   Image
+	Image   Image `json:"-"`
 	ImageID uint
 }
