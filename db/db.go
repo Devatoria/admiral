@@ -37,6 +37,7 @@ func Instance() *gorm.DB {
 			&models.Tag{},
 			&models.User{},
 			&models.Team{},
+			&models.TeamNamespaceRight{},
 		)
 
 		instance = db

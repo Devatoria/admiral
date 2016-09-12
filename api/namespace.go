@@ -75,6 +75,16 @@ func putNamespace(c *gin.Context) {
 	namespace.Owner = owner
 	db.Instance().Create(&namespace)
 
+	// Inject rights
+	rights := models.TeamNamespaceRight{
+		Team:      owner,
+		Namespace: namespace,
+		Pull:      true,
+		Push:      true,
+	}
+
+	db.Instance().Create(&rights)
+
 	c.JSON(http.StatusOK, namespace)
 }
 

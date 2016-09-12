@@ -69,6 +69,11 @@ func Run(address string, port int) {
 			v1auth.GET("/teamUsers/:id", getTeamUsers)
 			v1auth.POST("/teamUsers/:id", postTeamUsers)
 			v1auth.DELETE("/teamUsers/:teamID/:userID", deleteTeamUser)
+
+			// Team namespace rights management
+			v1auth.GET("/teamNamespaceRights/:teamID/:namespaceID", getTeamNamespaceRights)
+			v1auth.PUT("/teamNamespaceRight", putTeamNamespaceRight)
+			v1auth.DELETE("/teamNamespaceRight/:teamID/:namespaceID", deleteTeamNamespaceRight)
 		}
 	}
 

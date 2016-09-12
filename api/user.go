@@ -98,7 +98,7 @@ func putUser(c *gin.Context) {
 	db.Instance().Create(&user)
 
 	// Create user associated team
-	db.Instance().Create(&models.Team{Name: user.Username, Owner: user})
+	db.Instance().Create(&models.Team{Name: user.Username, Owner: user, Users: []models.User{user}})
 
 	user.Password = "[REDACTED]"
 
