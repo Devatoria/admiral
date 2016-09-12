@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -70,21 +71,12 @@ func postEvents(c *gin.Context) {
 			repSplit := strings.SplitN(event.Target.Repository, "/", 2)
 
 			// Get namespace
-			if len(repSplit) < 2 {
-				// Search for an image without namespace
-				var image models.Image
-				db.Instance().Where("name = ?", repSplit[0]).Find(&image)
-				if image.ID == 0 {
-					image.Name = repSplit[0]
-					db.Instance().Create(&image)
-				}
-			} else {
+			if len(repSplit) >= 2 {
 				// Search for a namespace
 				var namespace models.Namespace
 				db.Instance().Where("name = ?", repSplit[0]).Find(&namespace)
 				if namespace.ID == 0 {
-					namespace.Name = repSplit[0]
-					db.Instance().Create(&namespace)
+					panic(fmt.Sprintf("Missing namespace: %s", repSplit[0]))
 				}
 
 				// Search for an image
