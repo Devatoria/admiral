@@ -27,11 +27,6 @@ func getTeamUsers(c *gin.Context) {
 		return
 	}
 
-	// Sanitize passwords
-	for i := range team.Users {
-		team.Users[i].Password = "[REDACTED]"
-	}
-
 	c.JSON(http.StatusOK, team.Users)
 }
 

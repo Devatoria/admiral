@@ -53,8 +53,6 @@ func getTeam(c *gin.Context) {
 		return
 	}
 
-	team.Owner.Password = "[REDACTED]"
-
 	c.JSON(http.StatusOK, team)
 }
 
@@ -84,8 +82,6 @@ func putTeam(c *gin.Context) {
 
 	team := models.Team{Name: data.Name, Owner: owner}
 	db.Instance().Create(&team)
-
-	team.Owner.Password = "[REDACTED]"
 
 	c.JSON(http.StatusOK, team)
 }

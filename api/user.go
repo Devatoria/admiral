@@ -29,9 +29,6 @@ func getUsers(c *gin.Context) {
 
 	var users []models.User
 	db.Instance().Order("username").Limit(n).Find(&users)
-	for i := range users {
-		users[i].Password = "[REDACTED]"
-	}
 
 	c.JSON(http.StatusOK, users)
 }
@@ -51,8 +48,6 @@ func getUser(c *gin.Context) {
 		c.Status(http.StatusNotFound)
 		return
 	}
-
-	user.Password = "[REDACTED]"
 
 	c.JSON(http.StatusOK, user)
 }
@@ -99,8 +94,6 @@ func putUser(c *gin.Context) {
 
 	// Create user associated team
 	db.Instance().Create(&models.Team{Name: user.Username, Owner: user, Users: []models.User{user}})
-
-	user.Password = "[REDACTED]"
 
 	c.JSON(http.StatusOK, user)
 }
@@ -172,7 +165,6 @@ func patchUser(c *gin.Context) {
 	user.Username = data.Username
 	user.Password = string(hash)
 	db.Instance().Save(&user)
-	user.Password = "[REDACTED]"
 
 	c.JSON(http.StatusOK, user)
 }
