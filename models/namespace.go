@@ -7,5 +7,7 @@ import (
 // Namespace represents an image namespace (kind of "group" of images)
 type Namespace struct {
 	gorm.Model
-	Name string `gorm:not null;unique"`
+	Name    string `gorm:not null;unique"`
+	Owner   Team
+	OwnerID uint
 }

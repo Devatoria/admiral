@@ -13,7 +13,8 @@ import (
 
 // Namespace represents a namespace form model
 type Namespace struct {
-	Name string `form:"name" json:"name" binding:"required"`
+	Name    string `form:"name" json:"name" binding:"required"`
+	OwnerID uint   `form:"ownerID" json:"ownerID" binding:"required"`
 }
 
 // getNamespaces returns all namespaces in database, ordered by name
@@ -62,7 +63,16 @@ func putNamespace(c *gin.Context) {
 		return
 	}
 
+	// Check that owner team exists
+	var owner models.Team
+	db.Instance().Where("id = ?", data.OwnerID).Find(&owner)
+	if owner.ID == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
 	namespace.Name = data.Name
+	namespace.Owner = owner
 	db.Instance().Create(&namespace)
 
 	c.JSON(http.StatusOK, namespace)
@@ -109,7 +119,16 @@ func patchNamespace(c *gin.Context) {
 		return
 	}
 
+	// Check that owner team exists
+	var owner models.Team
+	db.Instance().Where("id = ?", data.OwnerID).Find(&owner)
+	if owner.ID == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
 	namespace.Name = data.Name
+	namespace.Owner = owner
 	db.Instance().Save(&namespace)
 
 	c.JSON(http.StatusOK, namespace)
