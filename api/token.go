@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"github.com/Devatoria/admiral/auth"
-	"github.com/Devatoria/admiral/db"
-	"github.com/Devatoria/admiral/models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -46,54 +44,7 @@ func getToken(c *gin.Context) {
 	var claimsAccesses []ClaimsAccess
 	scope := c.Query("scope")
 	if scope != "" {
-		// Retrieve namespace
-		// Scope is: repository:namespace/image:action
-		scopeSplit := strings.SplitN(scope, ":", 3)
-		if len(scopeSplit) != 3 {
-			c.Status(http.StatusUnauthorized)
-			return
-		}
-
-		repository := scopeSplit[1]
-		repositorySplit := strings.SplitN(repository, "/", 2)
-		if len(repositorySplit) != 2 {
-			c.Status(http.StatusUnauthorized)
-			return
-		}
-
-		var namespace models.Namespace
-		db.Instance().Where("name = ?", repositorySplit[0]).Find(&namespace)
-		if namespace.ID == 0 {
-			c.Status(http.StatusUnauthorized)
-			return
-		}
-
-		// Load user rights
-		var teams []models.Team
-		var teamIDs []uint
-		db.Instance().Model(&user).Association("Teams").Find(&teams)
-		for _, team := range teams {
-			teamIDs = append(teamIDs, team.ID)
-		}
-
-		var rights []models.TeamNamespaceRight
-		db.Instance().Where("team_id IN (?) AND namespace_id = ?", teamIDs, namespace.ID).Find(&rights)
-
-		for _, right := range rights {
-			var actions []string
-			if right.Pull {
-				actions = append(actions, "pull")
-			}
-			if right.Push {
-				actions = append(actions, "push")
-			}
-
-			claimsAccesses = append(claimsAccesses, ClaimsAccess{
-				Type:    "repository",
-				Name:    repository,
-				Actions: actions,
-			})
-		}
+		//TODO: retrieve rights
 	}
 
 	// Create bearer token

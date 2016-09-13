@@ -7,7 +7,7 @@ import (
 // Image represents an image stored in the registry
 type Image struct {
 	gorm.Model
-	Name        string
+	Name        string    `gorm:"not null"`
 	Namespace   Namespace `json:"-"`
 	NamespaceID uint
 }

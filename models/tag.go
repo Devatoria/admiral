@@ -7,7 +7,7 @@ import (
 // Tag represents an image tag
 type Tag struct {
 	gorm.Model
-	Name    string
-	Image   Image `json:"-"`
+	Name    string `gorm:"not null"`
+	Image   Image  `json:"-"`
 	ImageID uint
 }

@@ -3,6 +3,7 @@ package filters
 import (
 	"errors"
 	"regexp"
+	"strings"
 )
 
 var usernameRegex *regexp.Regexp
@@ -15,11 +16,12 @@ func init() {
 	}
 }
 
-// ValidateUsername returns an error if the given username doesn't match the regex, nil otherwise
-func ValidateUsername(username string) error {
+// SanitizeUsername ensure that username fit requirements
+func SanitizeUsername(username string) (string, error) {
+	username = strings.TrimSpace(username)
 	if !usernameRegex.MatchString(username) {
-		return errors.New("Username does not match conditions")
+		return "", errors.New("Username does not match conditions")
 	}
 
-	return nil
+	return username, nil
 }
