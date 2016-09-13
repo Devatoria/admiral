@@ -48,12 +48,11 @@ func Run(address string, port int) {
 			v1auth.GET("/namespace/:id/images", getNamespaceImages)
 
 			// Image endpoints
-			v1auth.GET("/images", getImages)
+			v1auth.GET("/images/:namespaceID", getImages)
 			v1auth.GET("/image/:id", getImage)
 			v1auth.GET("/image/:id/tags", getImageTags)
 
 			// User endpoints
-			v1auth.GET("/users", getUsers)
 			v1auth.GET("/user", getUser)
 			v1auth.DELETE("/user/:id", deleteUser)
 			v1auth.PATCH("/user/:id", patchUser)

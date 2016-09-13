@@ -18,21 +18,6 @@ type User struct {
 	Password string `form:"password" json:"password" binding:"required"`
 }
 
-// getUsers returns users ordered by username and hide passwords
-func getUsers(c *gin.Context) {
-	nParam := c.DefaultQuery("n", "25")
-	n, err := strconv.Atoi(nParam)
-	if err != nil {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	var users []models.User
-	db.Instance().Order("username").Limit(n).Find(&users)
-
-	c.JSON(http.StatusOK, users)
-}
-
 // getUser returns the given user but hide its password
 func getUser(c *gin.Context) {
 	idParam := c.Param("id")

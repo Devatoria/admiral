@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Devatoria/admiral/auth"
 	"github.com/Devatoria/admiral/db"
 	"github.com/Devatoria/admiral/models"
 
@@ -17,10 +18,20 @@ type Namespace struct {
 	OwnerID uint   `form:"ownerID" json:"ownerID" binding:"required"`
 }
 
-// getNamespaces returns all namespaces in database, ordered by name
+// getNamespaces returns all namespaces in the user default team
 func getNamespaces(c *gin.Context) {
+	// Get user default team
+	user, _ := auth.GetCurrentUser(c)
+	var team models.Team
+	db.Instance().Where("name = ?", user.Username).Find(&team)
+	if team.ID == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	// Get team namespaces
 	var namespaces []models.Namespace
-	db.Instance().Order("name").Find(&namespaces)
+	db.Instance().Where("owner_id = ?", team.ID).Order("name").Find(&namespaces)
 
 	c.JSON(http.StatusOK, namespaces)
 }
