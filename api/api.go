@@ -36,9 +36,6 @@ func Run(address string, port int) {
 			// Registry token endpoint
 			v1auth.GET("/token", getToken)
 
-			// Registry events notifications endpoint
-			v1auth.GET("/events", getEvents)
-
 			// Namespace endpoints
 			v1auth.GET("/namespaces", getNamespaces)
 			v1auth.GET("/namespace/:id", getNamespace)

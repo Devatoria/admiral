@@ -15,19 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getEvents(c *gin.Context) {
-	queryN := c.DefaultQuery("n", "25")
-	n, err := strconv.Atoi(queryN)
-	if err != nil {
-		n = 25
-	}
-
-	var events []models.Event
-	db.Instance().Order("created_at desc").Limit(n).Find(&events)
-
-	c.JSON(http.StatusOK, events)
-}
-
 func postEvents(c *gin.Context) {
 	// Get data and unmarshall to envelop struct
 	data, err := ioutil.ReadAll(c.Request.Body)
