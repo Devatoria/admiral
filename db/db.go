@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/Devatoria/admiral/models"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres adapter
 	"github.com/spf13/viper"
@@ -29,16 +27,6 @@ func Instance() *gorm.DB {
 		if err != nil {
 			panic(err)
 		}
-
-		db.AutoMigrate(
-			&models.Event{},
-			&models.Namespace{},
-			&models.Image{},
-			&models.Tag{},
-			&models.User{},
-			&models.Team{},
-			&models.TeamNamespaceRight{},
-		)
 
 		instance = db
 	})

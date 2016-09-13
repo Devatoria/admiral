@@ -5,6 +5,7 @@ import (
 
 	"github.com/Devatoria/admiral/api"
 	"github.com/Devatoria/admiral/db"
+	"github.com/Devatoria/admiral/models"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -73,7 +74,16 @@ var RootCmd = &cobra.Command{
 	Short: "Admiral is a Docker Registry admininistration and authentication system",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Force database init
-		_ = db.Instance()
+		dbi := db.Instance()
+		dbi.AutoMigrate(
+			&models.Event{},
+			&models.Namespace{},
+			&models.Image{},
+			&models.Tag{},
+			&models.User{},
+			&models.Team{},
+			&models.TeamNamespaceRight{},
+		)
 
 		// Check that issuer exists
 		var err error
