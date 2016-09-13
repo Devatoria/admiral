@@ -22,11 +22,11 @@ func Run(address string, port int) {
 		c.Status(http.StatusOK)
 	})
 
-	r.GET("/version", getVersion)
 	r.POST("/events", postEvents)
 
 	v1 := r.Group("/v1")
 	{
+		v1.GET("/version", getVersion)
 		v1.PUT("/user", putUser)
 
 		// Authenticated endpoints

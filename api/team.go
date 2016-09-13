@@ -24,15 +24,13 @@ type TeamUsers struct {
 
 // getTeams returns all teams ordered by name
 func getTeams(c *gin.Context) {
-	nParam := c.DefaultQuery("n", "25")
-	n, err := strconv.Atoi(nParam)
+	user, err := auth.GetCurrentUser(c)
 	if err != nil {
-		c.Status(http.StatusBadRequest)
-		return
+		panic(err)
 	}
 
 	var teams []models.Team
-	db.Instance().Order("name").Limit(n).Find(&teams)
+	db.Instance().Model(&user).Association("Teams").Find(&teams)
 
 	c.JSON(http.StatusOK, teams)
 }
