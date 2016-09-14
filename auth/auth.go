@@ -20,7 +20,7 @@ func Authenticate(req *http.Request) (models.User, error) {
 
 	var user models.User
 	db.Instance().Where("username = ?", username).Find(&user)
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 
 	return user, err
 }
