@@ -12,12 +12,13 @@ type Namespace struct {
 	Name    string `gorm:"not null;unique"`
 	Owner   User   `json:"-"`
 	OwnerID uint
+	Images  []Image `json:"-"`
 }
 
 // GetNamespaceByName finds a namespace using the given name
 func GetNamespaceByName(name string) Namespace {
 	var namespace Namespace
-	db.Instance().Where("name = ?", name).Find(&namespace)
+	db.Instance().Preload("Images").Where("name = ?", name).Find(&namespace)
 
 	return namespace
 }

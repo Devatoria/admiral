@@ -33,7 +33,7 @@ func Run(address string, port int) {
 		v1auth := r.Group("/v1")
 		v1auth.Use(middleware.AuthMiddleware())
 		{
-			// Registry token endpoint
+			v1auth.GET("/images", getImages)
 			v1auth.GET("/token", getToken)
 		}
 	}
