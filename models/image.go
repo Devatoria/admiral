@@ -1,6 +1,8 @@
 package models
 
 import (
+	"github.com/Devatoria/admiral/db"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -10,4 +12,12 @@ type Image struct {
 	Name        string    `gorm:"not null"`
 	Namespace   Namespace `json:"-"`
 	NamespaceID uint
+}
+
+// GetImageByName returns an image using the given name
+func GetImageByName(name string) Image {
+	var image Image
+	db.Instance().Where("name = ?", name).Find(&image)
+
+	return image
 }
