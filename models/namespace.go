@@ -18,7 +18,9 @@ type Namespace struct {
 // GetNamespaceByName finds a namespace using the given name
 func GetNamespaceByName(name string) Namespace {
 	var namespace Namespace
-	db.Instance().Preload("Images").Where("name = ?", name).Find(&namespace)
+	db.Instance().Preload("Images", func(gdb *gorm.DB) *gorm.DB {
+		return gdb.Order("images.name")
+	}).Where("name = ?", name).Find(&namespace)
 
 	return namespace
 }
