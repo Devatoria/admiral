@@ -12,6 +12,7 @@ type Image struct {
 	Name        string    `gorm:"not null"`
 	Namespace   Namespace `json:"-"`
 	NamespaceID uint
+	Tags        []Tag
 }
 
 // GetImageByName returns an image using the given name

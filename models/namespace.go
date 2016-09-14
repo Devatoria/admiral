@@ -20,6 +20,8 @@ func GetNamespaceByName(name string) Namespace {
 	var namespace Namespace
 	db.Instance().Preload("Images", func(gdb *gorm.DB) *gorm.DB {
 		return gdb.Order("images.name")
+	}).Preload("Images.Tags", func(gdb *gorm.DB) *gorm.DB {
+		return gdb.Order("tags.name")
 	}).Where("name = ?", name).Find(&namespace)
 
 	return namespace
