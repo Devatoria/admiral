@@ -44,7 +44,30 @@ func getToken(c *gin.Context) {
 	var claimsAccesses []ClaimsAccess
 	scope := c.Query("scope")
 	if scope != "" {
-		//TODO: retrieve rights
+		// Parse scope: repository:samalba/my-app:pull,push
+		scopeSplit := strings.SplitN(scope, ":", 3)
+		if len(scopeSplit) != 3 {
+			c.Status(http.StatusUnauthorized)
+			return
+		}
+
+		// Parse image name to retrieve namespace
+		imageName := scopeSplit[1]
+		imageSplit := strings.SplitN(imageName, "/", 2)
+		if len(imageSplit) != 2 {
+			c.Status(http.StatusUnauthorized)
+			return
+		}
+
+		// Check that this is the user namespace
+		nsName := imageSplit[0]
+		if nsName == user.Username {
+			claimsAccesses = append(claimsAccesses, ClaimsAccess{
+				Type:    "repository",
+				Name:    imageName,
+				Actions: []string{"pull", "push"},
+			})
+		}
 	}
 
 	// Create bearer token
