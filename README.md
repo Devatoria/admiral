@@ -99,11 +99,3 @@ Admiral can run a set of jobs (in addition of the default daemon behavior). Admi
 ```
 admiral job run synchronize
 ```
-
-## Create admin user
-
-In order to create an Admiral admin user, just run the following command: 
-
-```
-admiral job run create_admin <username> <password>
-```
