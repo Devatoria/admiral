@@ -1,38 +1,14 @@
 package api
 
 import (
-	"bytes"
-	"crypto"
-	"crypto/x509"
-	"encoding/base32"
-	"encoding/pem"
-	"io/ioutil"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/Devatoria/admiral/auth"
-	"github.com/Devatoria/admiral/db"
-	"github.com/Devatoria/admiral/models"
+	"github.com/Devatoria/admiral/token"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/satori/go.uuid"
-	"github.com/spf13/viper"
 )
-
-// ClaimsAccess represents an access to a repository
-type ClaimsAccess struct {
-	Type    string   `json:"type"`
-	Name    string   `json:"name"`
-	Actions []string `json:"actions"`
-}
-
-// Claims represents a custom JWT claims with a list of accesses
-type Claims struct {
-	Access []ClaimsAccess `json:"access"`
-	jwt.StandardClaims
-}
 
 // getToken returns a JWT bearer token to the registry containing the user accesses
 func getToken(c *gin.Context) {
@@ -43,146 +19,43 @@ func getToken(c *gin.Context) {
 	}
 
 	// Scope is empty only for authentication
-	var claimsAccesses []ClaimsAccess
+	var claimsAccesses []token.ClaimsAccess
 	scope := c.Query("scope")
 	if scope != "" {
-		// Retrieve namespace
-		// Scope is: repository:namespace/image:action
+		// Parse scope: repository:samalba/my-app:pull,push
 		scopeSplit := strings.SplitN(scope, ":", 3)
 		if len(scopeSplit) != 3 {
 			c.Status(http.StatusUnauthorized)
 			return
 		}
 
-		repository := scopeSplit[1]
-		repositorySplit := strings.SplitN(repository, "/", 2)
-		if len(repositorySplit) != 2 {
-			c.Status(http.StatusUnauthorized)
-			return
-		}
-
-		var namespace models.Namespace
-		db.Instance().Where("name = ?", repositorySplit[0]).Find(&namespace)
-		if namespace.ID == 0 {
-			c.Status(http.StatusUnauthorized)
-			return
-		}
-
-		// Load user rights
-		var teams []models.Team
-		var teamIDs []uint
-		db.Instance().Model(&user).Association("Teams").Find(&teams)
-		for _, team := range teams {
-			teamIDs = append(teamIDs, team.ID)
-		}
-
-		var rights []models.TeamNamespaceRight
-		db.Instance().Where("team_id IN (?) AND namespace_id = ?", teamIDs, namespace.ID).Find(&rights)
-
-		for _, right := range rights {
-			var actions []string
-			if right.Pull {
-				actions = append(actions, "pull")
-			}
-			if right.Push {
-				actions = append(actions, "push")
+		switch scopeSplit[0] {
+		case "repository":
+			// Parse image name to retrieve namespace
+			imageName := scopeSplit[1]
+			imageSplit := strings.SplitN(imageName, "/", 2)
+			if len(imageSplit) != 2 {
+				c.Status(http.StatusUnauthorized)
+				return
 			}
 
-			claimsAccesses = append(claimsAccesses, ClaimsAccess{
-				Type:    "repository",
-				Name:    repository,
-				Actions: actions,
-			})
+			// Check that this is the user namespace
+			nsName := imageSplit[0]
+			if nsName == user.Username {
+				claimsAccesses = append(claimsAccesses, token.ClaimsAccess{
+					Type:    "repository",
+					Name:    imageName,
+					Actions: []string{"pull", "push"},
+				})
+			}
 		}
 	}
 
-	// Create bearer token
-	claims := Claims{
-		claimsAccesses,
-		jwt.StandardClaims{
-			Issuer:    viper.GetString("auth.issuer"),
-			Subject:   user.Username,
-			Audience:  service,
-			ExpiresAt: time.Now().Add(time.Duration(viper.GetInt("auth.token-expiration")) * time.Minute).Unix(),
-			NotBefore: time.Now().Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Id:        uuid.NewV4().String(),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-
-	// Read certificate
-	certBytes, err := ioutil.ReadFile(viper.GetString("auth.certificate"))
+	t := token.NewToken(service, user.Username, claimsAccesses)
+	tString, err := token.SignToken(t)
 	if err != nil {
 		panic(err)
 	}
 
-	certPem, _ := pem.Decode(certBytes)
-	if certPem == nil {
-		panic("Failed to parse certificate")
-	}
-
-	cert, err := x509.ParseCertificate(certPem.Bytes)
-	if err != nil {
-		panic(err)
-	}
-
-	// Compute libtrust fingerprint
-	derBytes, err := x509.MarshalPKIXPublicKey(cert.PublicKey)
-	if err != nil {
-		panic(err)
-	}
-
-	hasher := crypto.SHA256.New()
-	_, err = hasher.Write(derBytes)
-	if err != nil {
-		panic(err)
-	}
-
-	token.Header["kid"] = keyIDEncode(hasher.Sum(nil)[:30])
-
-	// Read certificate private key
-	keyBytes, err := ioutil.ReadFile(viper.GetString("auth.private-key"))
-	if err != nil {
-		panic(err)
-	}
-
-	keyBlock, _ := pem.Decode(keyBytes)
-	if keyBlock == nil {
-		panic("Failed to parse private key")
-	}
-
-	key, err := x509.ParsePKCS1PrivateKey(keyBlock.Bytes)
-	if err != nil {
-		panic(err)
-	}
-
-	tokenString, err := token.SignedString(key)
-	if err != nil {
-		panic(err)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
-}
-
-func keyIDEncode(b []byte) string {
-	s := strings.TrimRight(base32.StdEncoding.EncodeToString(b), "=")
-	var buf bytes.Buffer
-	var i int
-	var err error
-	for i = 0; i < len(s)/4-1; i++ {
-		start := i * 4
-		end := start + 4
-		_, err = buf.WriteString(s[start:end] + ":")
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	_, err = buf.WriteString(s[i*4:])
-	if err != nil {
-		panic(err)
-	}
-
-	return buf.String()
+	c.JSON(http.StatusOK, gin.H{"token": tString})
 }

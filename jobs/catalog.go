@@ -10,6 +10,7 @@ import (
 
 	"github.com/Devatoria/admiral/db"
 	"github.com/Devatoria/admiral/models"
+	"github.com/Devatoria/admiral/token"
 
 	"github.com/spf13/viper"
 )
@@ -27,6 +28,19 @@ type Tags struct {
 
 // SynchronizeCatalog parses the registry catalog to get namespaces, images and associated tags and inserts it database if needed
 func SynchronizeCatalog(args []string) error {
+	// Prepare bearer token
+	t := token.NewToken("registry", "admiral", []token.ClaimsAccess{
+		token.ClaimsAccess{
+			Type:    "registry",
+			Name:    "catalog",
+			Actions: []string{"*"},
+		},
+	})
+	tString, err := token.SignToken(t)
+	if err != nil {
+		panic(err)
+	}
+
 	// Request catalog from registry
 	registryAddress := viper.GetString("registry.address")
 	registryPort := viper.GetInt("registry.port")
@@ -37,6 +51,7 @@ func SynchronizeCatalog(args []string) error {
 		return err
 	}
 
+	req.Header["Authorization"] = []string{fmt.Sprintf("Bearer %s", tString)}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -80,27 +95,43 @@ func SynchronizeCatalog(args []string) error {
 
 		// If public image (no namespace), just create image with null namespace
 		// Else, ensure namespace exists (or create it), and then create image
+		var image models.Image
 		if len(repSplit) == 1 {
 			if _, ok := existingImages[repository]; !ok {
-				image := models.Image{Name: repository}
+				image = models.Image{Name: repository}
 				log.Printf("Creating public image %s\n", image.Name)
 				db.Instance().Create(&image)
 				existingImages[image.Name] = image.ID
 			}
 		} else {
-			if _, ok := existingNamespaces[repSplit[0]]; !ok {
-				namespace := models.Namespace{Name: repSplit[0]}
-				log.Printf("Creating namespace %s\n", namespace.Name)
-				db.Instance().Create(&namespace)
-				existingNamespaces[namespace.Name] = namespace.ID
+			// Create image if namespace already exists but not image
+			if _, ok := existingNamespaces[repSplit[0]]; ok {
+				if _, ok := existingImages[repository]; !ok {
+					image = models.Image{Name: repository, NamespaceID: existingNamespaces[repSplit[0]]}
+					log.Printf("Creating image %s\n", image.Name)
+					db.Instance().Create(&image)
+					existingImages[image.Name] = image.ID
+				}
 			}
+		}
 
-			if _, ok := existingImages[repository]; !ok {
-				image := models.Image{Name: repository, NamespaceID: existingNamespaces[repSplit[0]]}
-				log.Printf("Creating image %s\n", image.Name)
-				db.Instance().Create(&image)
-				existingImages[image.Name] = image.ID
-			}
+		// If the image has not been created (unexisting namespace, for example), we skip the tags
+		if _, ok := existingImages[repository]; !ok {
+			fmt.Printf("Skipping %s tags because namespace does not exist\n", repository)
+			continue
+		}
+
+		// Prepare token
+		tTag := token.NewToken("registry", "admiral", []token.ClaimsAccess{
+			token.ClaimsAccess{
+				Type:    "repository",
+				Name:    repository,
+				Actions: []string{"pull"},
+			},
+		})
+		tTagString, err := token.SignToken(tTag)
+		if err != nil {
+			panic(err)
 		}
 
 		// Retrieve tags for current image
@@ -110,6 +141,7 @@ func SynchronizeCatalog(args []string) error {
 			continue
 		}
 
+		reqTags.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tTagString))
 		respTags, err := client.Do(reqTags)
 		if err != nil {
 			log.Printf("Unable to do HTTP request: %v", err)
@@ -132,6 +164,7 @@ func SynchronizeCatalog(args []string) error {
 		}
 
 		// Create entities
+		fmt.Printf("Found %d tags for image %s\n", len(tags.Tags), repository)
 		for _, tag := range tags.Tags {
 			tagEntity := models.Tag{
 				Name:    tag,

@@ -81,8 +81,6 @@ var RootCmd = &cobra.Command{
 			&models.Image{},
 			&models.Tag{},
 			&models.User{},
-			&models.Team{},
-			&models.TeamNamespaceRight{},
 		)
 
 		// Check that issuer exists

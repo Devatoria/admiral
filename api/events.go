@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/Devatoria/admiral/db"
@@ -60,15 +59,13 @@ func postEvents(c *gin.Context) {
 			// Get namespace
 			if len(repSplit) >= 2 {
 				// Search for a namespace
-				var namespace models.Namespace
-				db.Instance().Where("name = ?", repSplit[0]).Find(&namespace)
+				namespace := models.GetNamespaceByName(repSplit[0])
 				if namespace.ID == 0 {
 					panic(fmt.Sprintf("Missing namespace: %s", repSplit[0]))
 				}
 
 				// Search for an image
-				var image models.Image
-				db.Instance().Where("name = ?", event.Target.Repository).Find(&image)
+				image := models.GetImageByName(event.Target.Repository)
 				if image.ID == 0 {
 					image.Name = event.Target.Repository
 					image.Namespace = namespace
@@ -76,8 +73,7 @@ func postEvents(c *gin.Context) {
 				}
 
 				// Search for a tag
-				var tag models.Tag
-				db.Instance().Where("name = ? AND image_id = ?", event.Target.Tag, image.ID).Find(&tag)
+				tag := models.GetTagByName(event.Target.Tag, image.ID)
 				if tag.ID == 0 {
 					tag.Name = event.Target.Tag
 					tag.Image = image
