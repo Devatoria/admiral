@@ -95,9 +95,10 @@ func SynchronizeCatalog(args []string) error {
 
 		// If public image (no namespace), just create image with null namespace
 		// Else, ensure namespace exists (or create it), and then create image
+		var image models.Image
 		if len(repSplit) == 1 {
 			if _, ok := existingImages[repository]; !ok {
-				image := models.Image{Name: repository}
+				image = models.Image{Name: repository}
 				log.Printf("Creating public image %s\n", image.Name)
 				db.Instance().Create(&image)
 				existingImages[image.Name] = image.ID
@@ -106,12 +107,31 @@ func SynchronizeCatalog(args []string) error {
 			// Create image if namespace already exists but not image
 			if _, ok := existingNamespaces[repSplit[0]]; ok {
 				if _, ok := existingImages[repository]; !ok {
-					image := models.Image{Name: repository, NamespaceID: existingNamespaces[repSplit[0]]}
+					image = models.Image{Name: repository, NamespaceID: existingNamespaces[repSplit[0]]}
 					log.Printf("Creating image %s\n", image.Name)
 					db.Instance().Create(&image)
 					existingImages[image.Name] = image.ID
 				}
 			}
+		}
+
+		// If the image has not been created (unexisting namespace, for example), we skip the tags
+		if _, ok := existingImages[repository]; !ok {
+			fmt.Printf("Skipping %s tags because namespace does not exist\n", repository)
+			continue
+		}
+
+		// Prepare token
+		tTag := token.NewToken("registry", "admiral", []token.ClaimsAccess{
+			token.ClaimsAccess{
+				Type:    "repository",
+				Name:    repository,
+				Actions: []string{"pull"},
+			},
+		})
+		tTagString, err := token.SignToken(tTag)
+		if err != nil {
+			panic(err)
 		}
 
 		// Retrieve tags for current image
@@ -121,6 +141,7 @@ func SynchronizeCatalog(args []string) error {
 			continue
 		}
 
+		reqTags.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tTagString))
 		respTags, err := client.Do(reqTags)
 		if err != nil {
 			log.Printf("Unable to do HTTP request: %v", err)
@@ -143,6 +164,7 @@ func SynchronizeCatalog(args []string) error {
 		}
 
 		// Create entities
+		fmt.Printf("Found %d tags for image %s\n", len(tags.Tags), repository)
 		for _, tag := range tags.Tags {
 			tagEntity := models.Tag{
 				Name:    tag,
