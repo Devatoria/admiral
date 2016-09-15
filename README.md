@@ -8,23 +8,23 @@ It works on 2 ways:
 
 Admiral can synchronize itself with an existing registry using `synchronize` job described below.
 
+Actually, when you create a new user, the associated namespace is created. This namespace is private and personal: only the owner can push and pull on/from it.
+
 ## Features
 
 * Existing registry synchronization
 * Auto-update images and tags lists by listening to registry events
-* Teams and users management
-* Namespaces and images management
-* Basic authenticated calls
+* Authenticated calls
+* Private and personal namespaces
 
 ## Roadmap
 
 Features:
 
-* Rights management
-* Advanced authenticated calls
 * Delete images
-* Support other database engines
-* Support HTTPS
+* Public images (actually only private)
+* Team management
+* Quota management
 
 Side projects:
 
