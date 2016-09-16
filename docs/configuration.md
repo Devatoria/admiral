@@ -32,3 +32,31 @@ name = "admiral"
 address = "http://localhost"
 port = 5000
 ```
+
+### General configuration
+
+#### debug
+
+It enables the Gin framework debug mode (printing routes and some things).
+
+#### address & port
+
+Address (interface) and port admiral should listen to.
+
+### Authentication configuration
+
+#### issuer
+
+This parameter is shared between the docker registry and admiral and must be the same, otherwise, authentication will not work.
+
+#### token-expiration
+
+Bearer token expiration in minutes. After this time, the authentication will need another token.
+
+#### certificate & private-key
+
+Certificate and private key used to sign bearer token (and used to secure the registry).
+
+### Registry configuration
+
+The registry configuration is used to allow admiral to contact the registry, for example, to delete images.
