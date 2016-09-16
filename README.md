@@ -16,12 +16,12 @@ Actually, when you create a new user, the associated namespace is created. This 
 * Auto-update images and tags lists by listening to registry events
 * Authenticated calls
 * Private and personal namespaces
+* Image deletion
 
 ## Roadmap
 
 Features:
 
-* Delete images
 * Public images (actually only private)
 * Team management
 * Quota management
