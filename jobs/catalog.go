@@ -93,34 +93,6 @@ func SynchronizeCatalog(args []string) error {
 	for _, repository := range catalog.Repositories {
 		repSplit := strings.SplitN(repository, "/", 2)
 
-		// If public image (no namespace), just create image with null namespace
-		// Else, ensure namespace exists (or create it), and then create image
-		var image models.Image
-		if len(repSplit) == 1 {
-			if _, ok := existingImages[repository]; !ok {
-				image = models.Image{Name: repository}
-				log.Printf("Creating public image %s\n", image.Name)
-				db.Instance().Create(&image)
-				existingImages[image.Name] = image.ID
-			}
-		} else {
-			// Create image if namespace already exists but not image
-			if _, ok := existingNamespaces[repSplit[0]]; ok {
-				if _, ok := existingImages[repository]; !ok {
-					image = models.Image{Name: repository, NamespaceID: existingNamespaces[repSplit[0]]}
-					log.Printf("Creating image %s\n", image.Name)
-					db.Instance().Create(&image)
-					existingImages[image.Name] = image.ID
-				}
-			}
-		}
-
-		// If the image has not been created (unexisting namespace, for example), we skip the tags
-		if _, ok := existingImages[repository]; !ok {
-			fmt.Printf("Skipping %s tags because namespace does not exist\n", repository)
-			continue
-		}
-
 		// Prepare token
 		tTag := token.NewToken("registry", "admiral", []token.ClaimsAccess{
 			token.ClaimsAccess{
@@ -160,6 +132,39 @@ func SynchronizeCatalog(args []string) error {
 		err = json.Unmarshal(dataTags, &tags)
 		if err != nil {
 			log.Printf("Unable to parse response: %v", err)
+			continue
+		}
+
+		// Skip image creation if no tags
+		if len(tags.Tags) == 0 {
+			continue
+		}
+
+		// If public image (no namespace), just create image with null namespace
+		// Else, ensure namespace exists (or create it), and then create image
+		var image models.Image
+		if len(repSplit) == 1 {
+			if _, ok := existingImages[repository]; !ok {
+				image = models.Image{Name: repository}
+				log.Printf("Creating public image %s\n", image.Name)
+				db.Instance().Create(&image)
+				existingImages[image.Name] = image.ID
+			}
+		} else {
+			// Create image if namespace already exists but not image
+			if _, ok := existingNamespaces[repSplit[0]]; ok {
+				if _, ok := existingImages[repository]; !ok {
+					image = models.Image{Name: repository, NamespaceID: existingNamespaces[repSplit[0]]}
+					log.Printf("Creating image %s\n", image.Name)
+					db.Instance().Create(&image)
+					existingImages[image.Name] = image.ID
+				}
+			}
+		}
+
+		// If the image has not been created (unexisting namespace, for example), we skip the tags
+		if _, ok := existingImages[repository]; !ok {
+			fmt.Printf("Skipping %s tags because namespace does not exist\n", repository)
 			continue
 		}
 

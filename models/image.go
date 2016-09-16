@@ -18,7 +18,7 @@ type Image struct {
 // GetImageByName returns an image using the given name
 func GetImageByName(name string) Image {
 	var image Image
-	db.Instance().Where("name = ?", name).Find(&image)
+	db.Instance().Preload("Tags").Preload("Namespace").Preload("Namespace.Owner").Where("name = ?", name).Find(&image)
 
 	return image
 }

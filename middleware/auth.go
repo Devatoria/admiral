@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/Devatoria/admiral/auth"
+	"github.com/Devatoria/admiral/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +24,31 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Keys["user"] = user
+		c.Next()
+	}
+}
+
+// ImageOwnerMiddleware checks that the user is the owner of the namespace containing the required image
+func ImageOwnerMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user, err := auth.GetCurrentUser(c)
+		if err != nil {
+			c.AbortWithError(http.StatusUnauthorized, err)
+			return
+		}
+
+		image := models.GetImageByName(strings.TrimPrefix(c.Param("image"), "/"))
+		if image.ID == 0 {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+
+		if image.Namespace.Owner.ID != user.ID {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+
+		c.Keys["image"] = image
 		c.Next()
 	}
 }

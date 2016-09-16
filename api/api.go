@@ -34,6 +34,7 @@ func Run(address string, port int) {
 		v1auth.Use(middleware.AuthMiddleware())
 		{
 			v1auth.GET("/images", getImages)
+			v1auth.DELETE("/image/*image", middleware.ImageOwnerMiddleware(), deleteImage)
 			v1auth.GET("/token", getToken)
 		}
 	}
