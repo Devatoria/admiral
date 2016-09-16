@@ -145,7 +145,7 @@ func SynchronizeCatalog(args []string) error {
 		var image models.Image
 		if len(repSplit) == 1 {
 			if _, ok := existingImages[repository]; !ok {
-				image = models.Image{Name: repository}
+				image = models.Image{Name: repository, IsPublic: true}
 				log.Printf("Creating public image %s\n", image.Name)
 				db.Instance().Create(&image)
 				existingImages[image.Name] = image.ID

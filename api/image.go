@@ -154,3 +154,27 @@ func deleteImage(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+// setImagePublic sets the given public state at true, allowing pull to all users (but not push)
+func setImagePublic(c *gin.Context) {
+	image, ok := c.Keys["image"].(models.Image)
+	if !ok {
+		panic("Unable to get image from context")
+	}
+
+	image.IsPublic = true
+	db.Instance().Save(&image)
+	c.Status(http.StatusOK)
+}
+
+// setImagePrivate sets the given public state at false, disallowing pull/push for all users but the owner
+func setImagePrivate(c *gin.Context) {
+	image, ok := c.Keys["image"].(models.Image)
+	if !ok {
+		panic("Unable to get image from context")
+	}
+
+	image.IsPublic = false
+	db.Instance().Save(&image)
+	c.Status(http.StatusOK)
+}

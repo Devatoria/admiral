@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Devatoria/admiral/auth"
+	"github.com/Devatoria/admiral/models"
 	"github.com/Devatoria/admiral/token"
 
 	"github.com/gin-gonic/gin"
@@ -39,15 +40,24 @@ func getToken(c *gin.Context) {
 				return
 			}
 
-			// Check that this is the user namespace
+			image := models.GetImageByName(imageName)
 			nsName := imageSplit[0]
+			var accesses []string
+
+			// If image is part of the user namespace, give all accesses
+			// If image is public and not part of the user namespace, give pull only
 			if nsName == user.Username {
-				claimsAccesses = append(claimsAccesses, token.ClaimsAccess{
-					Type:    "repository",
-					Name:    imageName,
-					Actions: []string{"pull", "push"},
-				})
+				accesses = append(accesses, "*")
 			}
+			if image.IsPublic {
+				accesses = append(accesses, "pull")
+			}
+
+			claimsAccesses = append(claimsAccesses, token.ClaimsAccess{
+				Type:    "repository",
+				Name:    imageName,
+				Actions: accesses,
+			})
 		}
 	}
 

@@ -10,6 +10,7 @@ import (
 type Image struct {
 	gorm.Model
 	Name        string    `gorm:"not null"`
+	IsPublic    bool      `gorm:"not null;default:false"`
 	Namespace   Namespace `json:"-"`
 	NamespaceID uint
 	Tags        []Tag
