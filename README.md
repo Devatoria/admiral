@@ -17,12 +17,12 @@ Actually, when you create a new user, the associated namespace is created. This 
 * Authenticated calls
 * Private and personal namespaces
 * Image deletion
+* Public images
 
 ## Roadmap
 
 Features:
 
-* Public images (actually only private)
 * Team management
 * Quota management
 
