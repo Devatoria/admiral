@@ -1,6 +1,4 @@
-# Configuration
-
-## Admiral
+# Admiral configuration
 
 Admiral can be configured using a `config.toml` file locating at:
 
@@ -33,7 +31,7 @@ address = "http://localhost"
 port = 5000
 ```
 
-### General configuration
+## General configuration
 
 #### debug
 
@@ -43,7 +41,7 @@ It enables the Gin framework debug mode (printing routes and some things).
 
 Address (interface) and port admiral should listen to.
 
-### Authentication configuration
+## Authentication configuration
 
 #### issuer
 
@@ -57,6 +55,6 @@ Bearer token expiration in minutes. After this time, the authentication will nee
 
 Certificate and private key used to sign bearer token (and used to secure the registry).
 
-### Registry configuration
+## Registry configuration
 
 The registry configuration is used to allow admiral to contact the registry, for example, to delete images.
