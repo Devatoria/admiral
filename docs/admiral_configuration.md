@@ -1,5 +1,7 @@
 # Admiral configuration
 
+## Introduction
+
 Admiral can be configured using a `config.toml` file locating at:
 
 * `/etc/admiral` (production use)
