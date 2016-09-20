@@ -99,3 +99,11 @@ Admiral can run a set of jobs (in addition of the default daemon behavior). Admi
 ```
 admiral job run synchronize
 ```
+
+# Run tests
+
+This project contains several tests for different packages. If you want to contribute, and in order to be sure that your changes do not impact the project behavior, you can run tests using this command at the root of the project:
+
+```
+go test ./...
+```
