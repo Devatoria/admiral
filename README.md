@@ -10,7 +10,7 @@ Admiral can synchronize itself with an existing registry using `synchronize` job
 
 Actually, when you create a new user, the associated namespace is created. This namespace is private and personal: only the owner can push and pull on/from it.
 
-## Features
+# Features
 
 * Existing registry synchronization
 * Auto-update images and tags lists by listening to registry events
@@ -19,7 +19,7 @@ Actually, when you create a new user, the associated namespace is created. This 
 * Image deletion
 * Public images
 
-## Roadmap
+# Roadmap
 
 Features:
 
@@ -32,8 +32,39 @@ Side projects:
 * CLI
 * Web UI
 
-## Configuration
-### Configure the daemon
+# Getting started
+
+You can create a basic stack using the given `docker-compose.yml` file containing:
+
+* Admiral
+* Docker Registry
+* Postgres
+
+Just run the `docker-compose up` command at the root of the project. Note that you can get the [Admiral CLI](https://github.com/Devatoria/admiral-cli) to make the further steps easier.
+
+## Create a user
+
+With curl:
+
+```
+curl -XPUT -d '{"username":"test","password":"test"}' localhost:3000/v1/users
+```
+
+Or with the CLI:
+
+```
+admiral-cli user create test test
+```
+
+## Login with Docker
+
+```
+docker login localhost:5000
+Login Succeeded
+```
+
+# Configuration
+## Configure the daemon
 The configuration file of the Admiral daemon is really easy.
 
 ```
@@ -60,7 +91,7 @@ address = "http://localhost" # Docker Registry address
 port = 5000 # Docker Registry port
 ```
 
-### Configure the Docker Registry authentication
+## Configure the Docker Registry authentication
 In your `/etc/docker/registry/config.yml`, please add the following notification endpoint:
 
 ```

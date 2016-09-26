@@ -1,0 +1,25 @@
+version: 0.1
+storage:
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /home/registry/
+    maxthreads: 1000
+  delete:
+    enabled: true
+http:
+  addr: :5000
+auth:
+  token:
+    realm: http://localhost:3000/v1/token
+    service: registry
+    issuer: pepito
+    rootcertbundle: /certs/server.crt
+notifications:
+  endpoints:
+  - name: admiral
+    disabled: false
+    url: http://localhost:3000/events
+    timeout: 500ms
+    threshold: 5
+    backoff: 5s

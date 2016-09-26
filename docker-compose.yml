@@ -1,0 +1,28 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9.5.4
+    network_mode: host
+    ports:
+      - 5432
+    environment:
+      - POSTGRES_USER=admiral
+      - POSTGRES_PASSWORD=admiral
+  registry:
+    image: registry:2.5.0
+    network_mode: host
+    ports:
+      - 5000
+    volumes:
+      - ./fixtures/certs:/certs:ro
+      - ./fixtures/registry.yml:/etc/docker/registry/config.yml:ro
+  admiral:
+    build: .
+    network_mode: host
+    ports:
+      - 3000
+    depends_on:
+      - postgres
+      - registry
+    volumes:
+      - ./fixtures/certs:/certs:ro

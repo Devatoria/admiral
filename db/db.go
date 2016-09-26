@@ -2,7 +2,9 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"sync"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres adapter
@@ -16,19 +18,28 @@ var once sync.Once
 // a new one if needed using singleton pattern
 func Instance() *gorm.DB {
 	once.Do(func() {
-		db, err := gorm.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
-			viper.GetString("database.host"),
-			viper.GetInt("database.port"),
-			viper.GetString("database.user"),
-			viper.GetString("database.name"),
-			viper.GetString("database.password"),
-		))
+		for instance == nil {
+			log.Println("Connecting to database...")
+			db, err := gorm.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
+				viper.GetString("database.host"),
+				viper.GetInt("database.port"),
+				viper.GetString("database.user"),
+				viper.GetString("database.name"),
+				viper.GetString("database.password"),
+			))
 
-		if err != nil {
-			panic(err)
+			if err != nil {
+				log.Printf("Failed to connect to database, waiting and retrying: %v\n", err)
+				if err := db.Close(); err != nil {
+					panic(fmt.Sprintf("Failed to close database connection: %v", err))
+				}
+
+				time.Sleep(3 * time.Second)
+				continue
+			}
+
+			instance = db
 		}
-
-		instance = db
 	})
 
 	return instance
