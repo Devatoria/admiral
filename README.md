@@ -1,3 +1,5 @@
+The documentation is available on [RTFD](http://admiral.readthedocs.io/en/latest/)!
+
 # Admiral
 Admiral is a Docker Registry administration and authentication system. It is under development and is aiming to be a real production tool.
 
