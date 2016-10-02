@@ -26,6 +26,12 @@ URI | Method | Description | Body | Returns
 
 Authenticated calls need the user to use HTTP basic authentication system in order to de these calls.
 
+## Login
+
+URI | Method | Description | Parameters | Returns
+--- | ------ | ----------- | ---------- | -------
+/v1/login | GET | Check if the user is able to login | | <ul><li>200 OK</li><li>401 Unauthorized</li></ul>
+
 ## Images
 
 URI | Method | Description | Parameters | Returns

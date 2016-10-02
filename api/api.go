@@ -38,6 +38,7 @@ func Run(address string, port int) {
 			v1auth.PATCH("/image/public/*image", middleware.ImageOwnerMiddleware(), setImagePublic)
 			v1auth.PATCH("/image/private/*image", middleware.ImageOwnerMiddleware(), setImagePrivate)
 
+			v1auth.GET("/login", getLogin)
 			v1auth.GET("/token", getToken)
 		}
 	}
