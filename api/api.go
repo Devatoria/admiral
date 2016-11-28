@@ -34,12 +34,25 @@ func Run(address string, port int) {
 		v1auth.Use(middleware.AuthMiddleware())
 		{
 			v1auth.GET("/images", getImages)
+			v1auth.GET("/image/*image", middleware.ImageOwnerMiddleware(), getImage)
 			v1auth.DELETE("/image/*image", middleware.ImageOwnerMiddleware(), deleteImage)
 			v1auth.PATCH("/image/public/*image", middleware.ImageOwnerMiddleware(), setImagePublic)
 			v1auth.PATCH("/image/private/*image", middleware.ImageOwnerMiddleware(), setImagePrivate)
 
 			v1auth.GET("/login", getLogin)
 			v1auth.GET("/token", getToken)
+		}
+		
+		v1admin := r.Group("/v1/admin")
+		v1admin.Use(middleware.AdminMiddleware())
+		{
+			v1admin.GET("/images", getAllImages)
+			v1admin.DELETE("/image/*image", middleware.ImageContextMiddleware(), deleteImage)
+			v1admin.GET("/image/*image", middleware.ImageContextMiddleware(), getImage)
+			v1admin.PATCH("/image/public/*image", middleware.ImageContextMiddleware(), setImagePublic)
+			v1admin.PATCH("/image/private/*image", middleware.ImageContextMiddleware(), setImagePrivate)
+
+			v1admin.GET("/login", getLogin)
 		}
 	}
 

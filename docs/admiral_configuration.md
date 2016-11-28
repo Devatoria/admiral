@@ -21,6 +21,10 @@ token-expiration = 5
 certificate = "/certs/server.crt"
 private-key = "/certs/server.key"
 
+[admin]
+username = "admin"
+password = "password"
+
 [database]
 host = "localhost"
 port = 5432
@@ -60,3 +64,6 @@ Certificate and private key used to sign bearer token (and used to secure the re
 ## Registry configuration
 
 The registry configuration is used to allow admiral to contact the registry, for example, to delete images.
+
+## Admin configuration
+Set an admin user which be able to do action on all images
