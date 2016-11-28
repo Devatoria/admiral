@@ -35,6 +35,24 @@ func getImages(c *gin.Context) {
 	c.JSON(http.StatusOK, namespace.Images)
 }
 
+// getAllImages returns all images contained in all namespaces
+func getAllImages(c *gin.Context) {
+	// Get images
+	var images []models.Image
+	c.JSON(http.StatusOK, db.Instance().Find(&images))
+}
+
+// getImage returns single image
+func getImage(c *gin.Context) {
+	// Get images
+	image, ok := c.Keys["image"].(models.Image)
+	if !ok {
+		panic("Unable to get image from context")
+	}
+	c.JSON(http.StatusOK, image)
+}
+
+
 // deleteImage deletes the given image and all its tags from the registry and the database
 func deleteImage(c *gin.Context) {
 	image, ok := c.Keys["image"].(models.Image)

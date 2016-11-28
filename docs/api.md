@@ -37,6 +37,7 @@ URI | Method | Description | Parameters | Returns
 URI | Method | Description | Parameters | Returns
 --- | ------ | ----------- | ---------- | -------
 /v1/images               | GET    | Return the user's images                 |                | <ul><li>200 OK</li><li>401 Unauthorized</li></ul>
+/v1/image/*image         | GET | Return the image | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>
 /v1/image/*image         | DELETE | Remove the given image with all its tags | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>
 /v1/image/public/*image  | PATCH  | Set the given image as public            | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>
 /v1/image/private/*image | PATCH  | Set the given image as public            | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>
@@ -46,3 +47,13 @@ URI | Method | Description | Parameters | Returns
 URI | Method | Description | Parameters | Returns
 --- | ------ | ----------- | ---------- | -------
 /v1/token | GET | Get a bearer token for the asked resource | | <ul><li>200 OK</li><li>401 Unauthorized</li></ul>
+
+## Admin
+URI | Method | Description | Parameters | Returns
+--- | ------ | ----------- | ---------- | -------
+/v1/admin/login | GET | Check if the admin is able to login | | <ul><li>200 OK</li><li>401 Unauthorized</li></ul>
+/v1/admin/images               | GET    | Return all images                 |                | <ul><li>200 OK</li><li>401 Unauthorized</li></ul>
+/v1/admin/image/*image         | GET | Return the image | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>
+/v1/admin/image/*image         | DELETE | Remove the given image with all its tags | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>
+/v1/admin/image/public/*image  | PATCH  | Set the given image as public            | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>
+/v1/admin/image/private/*image | PATCH  | Set the given image as public            | The image name | <ul><li>200 OK</li><li>401 Unauthorized</li><li>404 Not Found</li></ul>

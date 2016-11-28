@@ -9,6 +9,10 @@ token-expiration = 5
 certificate = "/certs/server.crt"
 private-key = "/certs/server.key"
 
+[admin]
+username = "admin"
+password = "password"
+
 [database]
 host = "localhost"
 port = 5432
