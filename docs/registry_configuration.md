@@ -11,7 +11,7 @@ All of these configurations must be in the `/etc/docker/registry/config.yml` fil
 
 ## Events
 
-This will ask to the registry to send events to Admiral. It will store these events in database in order to allow to make some audit on this. It will also get push events in order to maintain images database up to date.
+This will ask to the registry to send events to Admiral. It will store these events in a database in order to allow to make some audit on this. It will also get push events in order to maintain images database up to date.
 
 ```
 notifications:
