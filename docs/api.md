@@ -24,7 +24,7 @@ URI | Method | Description | Body | Returns
 
 # Authenticated calls
 
-Authenticated calls need the user to use HTTP basic authentication system in order to de these calls.
+Authenticated calls need the user to use HTTP basic authentication system in order to do these calls.
 
 ## Login
 
